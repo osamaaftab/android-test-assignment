@@ -1,5 +1,6 @@
 package com.example.shacklehotelbuddy.presentation.compose.home
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -53,7 +54,6 @@ import com.example.shacklehotelbuddy.presentation.compose.utils.Label
 import com.example.shacklehotelbuddy.presentation.theme.ShackleHotelBuddyTheme
 import com.example.shacklehotelbuddy.presentation.theme.White
 import com.example.shacklehotelbuddy.presentation.viewmodel.PropertyViewModel
-
 
 @Composable
 fun HomeScreen(
@@ -115,138 +115,51 @@ fun HomeScreen(
                 ) {
 
                     Column {
-
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.height(60.dp)
-                        ) {
-
-                            val modifier = (Modifier
-                                .fillMaxWidth()
-                                .weight(1f))
-
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(16.dp)
-                            ) {
-                                Label(R.string.check_in_date, R.drawable.event_upcoming)
-                            }
-
-                            DateTextField(
-                                label = R.string.date_format,
-                                value = checkInDateText,
-                                onValueChange = {
-                                    checkInDateText = it
-                                },
-                                onDateClick = {
-                                    showDatePickerDialog(
-                                        context,
-                                        checkInDateText,
-                                        System.currentTimeMillis()
-                                    ) {
-                                        checkInDateText = it
-                                        checkOutDateText = ""
-                                        isCheckInFieldFilled = true
-                                    }
-                                }, modifier
-                            )
+                        RowWithCheckInDateField(
+                            R.string.check_in_date,
+                            R.drawable.event_upcoming,
+                            R.string.date_format,
+                            checkInDateText,
+                            context) {
+                            checkInDateText = it
+                            checkOutDateText = ""
+                            isCheckInFieldFilled = true
                         }
 
                         VerticalDivider()
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.height(60.dp)
+                        RowWithCheckOutDateField(
+                            R.string.check_out_date,
+                            R.drawable.event_available,
+                            R.string.date_format,
+                            checkInDateText,
+                            checkOutDateText,
+                            context,
+                            isCheckInFieldFilled
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(16.dp)
-                            ) {
-                                Label(R.string.check_out_date, R.drawable.event_available)
-                            }
-
-                            val modifier = (
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .weight(1f))
-                            DateTextField(
-                                label = R.string.date_format,
-                                value = checkOutDateText,
-                                onValueChange = { checkOutDateText = it },
-                                onDateClick = {
-                                    if (isCheckInFieldFilled) {
-                                        showDatePickerDialog(
-                                            context, checkOutDateText,
-                                            getMillisFromDayMonthYear(
-                                                getDateModel(
-                                                    checkInDateText
-                                                )
-                                            )
-                                        ) {
-                                            checkOutDateText = it
-                                        }
-                                    }
-                                }, modifier
-                            )
+                            checkOutDateText = it
                         }
 
                         VerticalDivider()
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.height(60.dp)
+                        RowWithInputField(
+                            R.string.adults,
+                            R.drawable.person,
+                            R.string.zero,
+                            adultText
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(16.dp)
-                            ) {
-                                Label(R.string.adults, R.drawable.person)
-                            }
-
-                            val modifier = (
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .weight(1f))
-
-                            InputTextField(
-                                R.string.zero, adultText,
-                                onValueChange = { adultText = it },
-                                modifier
-                            )
+                            adultText = it
                         }
 
                         VerticalDivider()
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.height(60.dp)
+                        RowWithInputField(
+                            R.string.children,
+                            R.drawable.supervisor_account,
+                            R.string.zero,
+                            childrenText
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(16.dp)
-                            ) {
-                                Label(R.string.children, R.drawable.supervisor_account)
-                            }
-
-
-                            val modifier = (
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .weight(1f))
-
-                            InputTextField(
-                                R.string.zero, childrenText,
-                                onValueChange = { childrenText = it },
-                                modifier
-                            )
+                            childrenText = it
                         }
                     }
                 }
@@ -301,6 +214,137 @@ fun HomeScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun RowWithInputField(
+    label: Int,
+    drawable: Int,
+    placeHolder: Int ,
+    value: String,
+    onValueChange: (value: String) -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.height(60.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .weight(1f)
+                .padding(16.dp)
+        ) {
+            Label(label, drawable)
+        }
+
+
+        val modifier = (
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f))
+
+        InputTextField(
+            placeHolder, value,
+            onValueChange = { onValueChange(it) },
+            modifier
+        )
+    }
+}
+
+@Composable
+private fun RowWithCheckOutDateField(
+    label: Int,
+    drawable: Int,
+    placeHolder: Int,
+    checkInValue: String,
+    value: String,
+    context: Context,
+    isCheckInFieldFilled: Boolean,
+    onValueChange: (value: String) -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.height(60.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .weight(1f)
+                .padding(16.dp)
+        ) {
+            Label(label, drawable)
+        }
+
+        val modifier = (
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f))
+        DateTextField(
+            label = placeHolder,
+            value = value,
+            onValueChange = { onValueChange(it) },
+            onDateClick = {
+                if (isCheckInFieldFilled) {
+                    showDatePickerDialog(
+                        context, value,
+                        getMillisFromDayMonthYear(
+                            getDateModel(
+                                checkInValue
+                            )
+                        )
+                    ) {
+                        onValueChange(it)
+                    }
+                }
+            }, modifier
+        )
+    }
+}
+
+@Composable
+private fun RowWithCheckInDateField(
+    label: Int,
+    drawable: Int,
+    placeHolder: Int,
+    value: String,
+    context: Context,
+    onValueChange: (value: String) -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.height(60.dp)
+    ) {
+
+        val modifier = (Modifier
+            .fillMaxWidth()
+            .weight(1f))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .weight(1f)
+                .padding(16.dp)
+        ) {
+            Label(label, drawable)
+        }
+
+        DateTextField(
+            label = placeHolder,
+            value = value,
+            onValueChange = {
+                onValueChange(it)
+            },
+            onDateClick = {
+                showDatePickerDialog(
+                    context,
+                    value,
+                    System.currentTimeMillis()
+                ) {
+                    onValueChange(it)
+                }
+            }, modifier
+        )
     }
 }
 
