@@ -1,4 +1,4 @@
-package com.example.shacklehotelbuddy.ui.theme
+package com.example.shacklehotelbuddy.presentation.theme
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -13,7 +13,6 @@ data class CustomTypography constructor(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.W400,
         fontSize = 14.sp,
-        lineHeight = 20.sp,
         letterSpacing = 0.5.sp
     )
 )
